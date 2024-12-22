@@ -1,0 +1,14 @@
+https://projects.100xdevs.com/tracks/nextjs-1/next-1
+
+fixes waterfalling prob, gives SSR and file based routing and SEO optim
+-(auth) to exclude /auth from route
+-[...slugs]-Dynamic routes
+-Can’t be distributed via a CDN, always needs a server running that does server side rendering and hence is expensive
+
+
+-npx create-next-app@latest
+-layout.tsx to make stuff thatll repeat thruout pages like the banner on top of sites
+-"use client" for onclick
+    onClick handlers use JavaScript to respond to user actions, like button clicks, without reloading the page.
+    Since JavaScript for handling events runs in the browser, this functionality requires the component to be rendered on the client-side.
+-push use client as down as possible
