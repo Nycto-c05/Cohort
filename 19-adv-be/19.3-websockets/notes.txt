@@ -1,0 +1,57 @@
+https://projects.100xdevs.com/tracks/ABEC/ABEC-1
+
+-https://datatracker.ietf.org/doc/html/rfc6455
+
+---------------------------------
+
+-BE comm with each other
+-Those other BE can perform the less imp task asyncly, like sending SMS regarding transactions.
+-The main BE performs the main task, and send the less imp task to a pub/sub or msg Queue where the other microservice can pick up tasks as time permit & send back to queue if failed and retry
+
+
+Synchronous (Strong coupling) - send msg and wait for ack
+
+    HTTP (REST/GraphQL)
+
+    Websocket (debatable if sync or async)
+
+ 
+Asynchronous (Weak coupling) - send msg n move on
+
+    Messaging queues
+
+    Pub subs
+
+    Server-Sent Events 
+
+    Websocket (debatable if sync or async)
+
+
+---------------------------------
+
+web socket - browser to talk to servers, persistent conn, full duplex(server can send events to browser, unlike http)
+    in http, gotta do a 3 way handshake, hence overhead
+hhtp aint optimal for real time data like stock prices, cuz u doing db pooling(send req to server every instance)
+
+-Ws starts out as http req, which then upgrades the req to ws
+
+
+-------------
+Postman -> new -> Websocket
+------------
+
+WS clientside - some react code to connect to the WS backend server
+
+---------------
+scaling web servers: Assume some site has their own server, which has fleet of ws servers
+-sticky connection: all users in a room are connected to the same server aka sharding ig (irresp what region u from, u go to same ws server)
+
+-another way, one region user connect to their region server closer to em, but then each ws server must also comm with each other (movement of india user must reflect to usa user) hence support for more users
+
+So if ppl from diff regions in same room but diff ws servers, then we can implement a pub/sub where u publish ur action/movement and everyone who is subbed to the same room will get to see the action
+
+-Horizontal scaling usually in Websocket
+
+ sockets uses TCP and webrtc can use UDP(can afford to miss few events)
+
+

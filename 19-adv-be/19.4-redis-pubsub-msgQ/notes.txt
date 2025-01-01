@@ -1,0 +1,14 @@
+https://projects.100xdevs.com/tracks/Redis/Redis1
+
+Leetcode using Polling method
+    -The user submits the code to the BE, which then pushes it to a msgQ, and a worker picks from Q, runs it and pushes to a DB wheter TLE or Succeed.
+    -The Browser then keeps sending check/ reqs to the BE which constantly polls the DB whether an entry regarding status of code submission
+    -If more users submits, then more workers (scale up and down)
+    -You never run the code on the BE because user can write code to cat out your env files and all
+
+Part 2 (Better Appraoch):
+    -Instead of Polling the BE, we can setup a websocket persistant connection which will give the User the status of the code whenever the submission is complete and in the DB.
+    -The Worker processes the code and publishes to a PubSub and the websocket subs to it and picks up the result and gives back to user
+    -Why not make the Worker give directly to the websocket, cuz usually there is a fleet of ws servers, so worker doesn't know to which WS sever is the user connected to. Hence, we maintain pubsub and if user1 made submission, then the ws server will sub for a response relating the user1. (See img1)
+
+Part 3: Final Arch is a merge of both
