@@ -1,14 +1,35 @@
 https://projects.100xdevs.com/tracks/Redis/Redis1
 
 Leetcode using Polling method
-    -The user submits the code to the BE, which then pushes it to a msgQ, and a worker picks from Q, runs it and pushes to a DB wheter TLE or Succeed.
+    -The user submits the code to the BE, which then pushes it to a msgQ, and a worker picks from Q, runs it and pushes to a DB wheter TLE or Succeed. (Q cuz running mulitple codes on  that 1 same machine might not handle multiple reqs)
     -The Browser then keeps sending check/ reqs to the BE which constantly polls the DB whether an entry regarding status of code submission
     -If more users submits, then more workers (scale up and down)
     -You never run the code on the BE because user can write code to cat out your env files and all
 
-Part 2 (Better Appraoch):
+Part 2 (Better Appraoch): Sending is done using Above:  Client -> BE -> Q -> Worker ->DB and PubSub
     -Instead of Polling the BE, we can setup a websocket persistant connection which will give the User the status of the code whenever the submission is complete and in the DB.
     -The Worker processes the code and publishes to a PubSub and the websocket subs to it and picks up the result and gives back to user
     -Why not make the Worker give directly to the websocket, cuz usually there is a fleet of ws servers, so worker doesn't know to which WS sever is the user connected to. Hence, we maintain pubsub and if user1 made submission, then the ws server will sub for a response relating the user1. (See img1)
 
 Part 3: Final Arch is a merge of both
+Client -> BE -> Q -> Worker -> DB and PubSub --from PubSub--> WebSocket to client --> response
+
+----------------------------------------------------------------------------------
+
+REDIS : In-mem Data Store
+Used for DB caching, and msg broker - see redis.png
+    -if u hv multiple BE, if one BE req to stuff from DB, Redis can cache and now its acceessible to all BE.
+    -If you had to cache in BE, then only tht one BE would have access to it
+    -If redis fails, it previously cached data is stored to FS / or just retrieve from DB 1 more time
+    -If DB changes, then make the BE clear Cache and pull again
+
+You can spawn multiple workers using node worker.ts 
+Since the docker redis is operating on port, the server sends the req there even if the worker is down
+Whenever the worker code is backup again, it starts taking from the Q that the server that been sending to
+
+If worker pops from Q and then Worker went down, then you might wanna implement a acknowledgement sys, where the Q waits for ACK from worker, if timeout, then place back into Q, Look into how to do ACK in redis
+
+
+========EXTRAS
+Read on Materialized Views
+https://www.reddit.com/r/rails/comments/43vn9d/postgresql_materialized_views_and_alternatives/
